@@ -6,6 +6,8 @@ Serial pc(USBTX, USBRX);
 
 #define BUFFER_SIZE 1024
 #define SAMPLE_RATE 10000
+#define NUM_ROWS 15
+#define NUM_COLS 30
 
 LocalFileSystem local("local");
 
@@ -13,28 +15,32 @@ int data_idx = 0;
 int samples_idx = 0;
 
 short samples[BUFFER_SIZE];
-short mx[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned ff input data
+short mx[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned fft input data
 short my[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned fft output data
 float spectrum[BUFFER_SIZE/2];  // frequency spectrum
-
+float norm_spectrum[BUFFER_SIZE/2];  // frequency spectrum
 bool full = false;
 
 float magnitude(short y1, short y2);
+int idxConversion(int c, int r);
+void norm();
+
 void updateSamples();
 void printSamples();
 void calcFFT();
 void printFFT();
+void lightLeds();
 
 int main() {
     // Setup
-    while (data_idx < NUM_ELEMENTS) {
+    while (1) {
         // Always update samples
         updateSamples();
         if (full) {
             // Do FFT
             calcFFT();
             // Display FFT
-            // printFFT();
+            lightLeds();
             // Reset full flag
             full = false;
         }
@@ -42,9 +48,31 @@ int main() {
     }
 }
 
-float magnitude(short y1, short y2)
-{
+float magnitude(short y1, short y2) {
     return sqrt(float(y1 * y1 + y2 * y2));
+}
+
+int idxConverstion(int c, int r) {
+    int idx;
+    if (c % 2 == 0) {
+        idx = (c + 1) * NUM_ROWS - r - 1;
+    } else {
+        idx = c * NUM_ROWS + r;
+    }
+    return idx;
+}
+
+void norm() {
+    float mx = 0;
+    for (int i = 0; i < (BUFFER_SIZE / 2); i++) {
+        if (spectrum[i] > mx) {
+            mx = spectrum[i];
+        }
+    }
+
+    for (int i = 0; i < (BUFFER_SIZE / 2); i++) {
+        norm_spectrum[i] = specrum[i] / mx;
+    }
 }
 
 void updateSamples() {
@@ -52,18 +80,18 @@ void updateSamples() {
     samples_idx++;
 
     if (samples_idx >= BUFFER_SIZE) {
-        // pc.printf("Samples full.\r\n");
         full = true;
         samples_idx = 0;
     }
-
-    pc.printf("Sample index: %d\n\r", samples_idx);
-    pc.printf("Data index: %d\n\r", data_idx);
-    wait(0.1);
+    
+    if ((data_idx + BUFFER_SIZE) > (NUM_ELEMENTS - 1)) {
+        data_idx = 0;
+    } else {
+        data_idx += BUFFER_SIZE;
+    }
 }
 
 void calcFFT() {
-    // pc.printf("Calculating FFT.\n\r");
     for (int i = 0; i < 2 * BUFFER_SIZE; i++) {
         my[i] = 0;
         mx[i] = 0;
@@ -82,14 +110,24 @@ void calcFFT() {
     }
 }
 
-void printFFT() {
-    pc.printf("Printing FFT.\n\r");
-    FILE *fp = fopen("/local/fft.csv","w");
-    int j = 0;
-    for (int i = 0; i < BUFFER_SIZE; i += 2) {
-        int frequency = int(SAMPLE_RATE / BUFFER_SIZE / 2 * i);
-        fprintf(fp, "%d,%f\n", frequency, spectrum[j]);
-        j++;
+/*
+ *    void printFFT() {
+ *        FILE *fp = fopen("/local/fft.csv","w");
+ *        int j = 0;
+ *        for (int i = 0; i < BUFFER_SIZE; i += 2) {
+ *            int frequency = int(SAMPLE_RATE / BUFFER_SIZE / 2 * i);
+ *            fprintf(fp, "%d,%f\n", frequency, spectrum[j]);
+ *           j++;
+ *        }
+ *        fclose(fp);
+ *    }
+ */
+
+void lightLeds() {
+    norm();
+
+    for (int i = 0; i < NUM_COLS; i++) {
+        int height = (int) ((float) NUM_ROWS * norm_spectrum[i]);
+        pc.printf("Height: %d\n\r", height);
     }
-    fclose(fp);
 }
