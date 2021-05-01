@@ -27,7 +27,7 @@ void printFFT();
 
 int main() {
     // Setup
-    while (true) {
+    while (data_idx < NUM_ELEMENTS) {
         // Always update samples
         updateSamples();
         if (full) {
@@ -55,12 +55,6 @@ void updateSamples() {
         // pc.printf("Samples full.\r\n");
         full = true;
         samples_idx = 0;
-
-        if ((data_idx + BUFFER_SIZE) > NUM_ELEMENTS) {
-            data_idx = 0;
-        } else {
-            data_idx += BUFFER_SIZE;
-        }
     }
 
     pc.printf("Sample index: %d\n\r", samples_idx);
