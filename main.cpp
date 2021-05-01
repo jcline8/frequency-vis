@@ -1,5 +1,5 @@
 #include "mbed.h"
-#include "audiodata.h"
+#include "audio.h"
 
 extern "C" void fftR4(short *y, short *x, int N);
 Serial pc(USBTX, USBRX);
@@ -71,7 +71,7 @@ void norm() {
     }
 
     for (int i = 0; i < (BUFFER_SIZE / 2); i++) {
-        norm_spectrum[i] = specrum[i] / mx;
+        norm_spectrum[i] = spectrum[i] / mx;
     }
 }
 
@@ -125,9 +125,11 @@ void calcFFT() {
 
 void lightLeds() {
     norm();
-
+    
     for (int i = 0; i < NUM_COLS; i++) {
         int height = (int) ((float) NUM_ROWS * norm_spectrum[i]);
-        pc.printf("Height: %d\n\r", height);
+        pc.printf("%d, ", height);
     }
+    pc.printf("\n\n\r");
+    wait(0.05);
 }
