@@ -45,22 +45,11 @@ int main() {
     leds.clear();
     leds.setBrightness(brightness);
 
-    for (int i = 0; i < N; i++) {
-        leds.setPixel(i, RED);
-        leds.write();
-        wait(0.01);
-    }
-
-    // Setup
     while (1) {
-        // Always update samples
         updateSamples();
         if (full) {
-            // Do FFT
             calcFFT();
-            // Display FFT
-            // lightLeds();
-            // Reset full flag
+            lightLeds();
             full = false;
         }
         wait(1.0/SAMPLE_RATE);
@@ -97,12 +86,10 @@ void norm() {
 void updateSamples() {
     samples[samples_idx] = (short) (sound_data[data_idx] - 0x8000);
     samples_idx++;
-
     if (samples_idx >= BUFFER_SIZE) {
         full = true;
         samples_idx = 0;
     }
-    
     if ((data_idx + BUFFER_SIZE) > (NUM_ELEMENTS - 1)) {
         data_idx = 0;
     } else {
@@ -115,13 +102,10 @@ void calcFFT() {
         my[i] = 0;
         mx[i] = 0;
     }
- 
     for (int i = 0; i < BUFFER_SIZE; i++) {
         mx[i * 2] = samples[i];
     }
- 
     fftR4(my, mx, BUFFER_SIZE);
- 
     int j = 0;
     for (int i = 0; i < BUFFER_SIZE; i+=2) {
         spectrum[j] = magnitude(my[i], my[i + 1]);
