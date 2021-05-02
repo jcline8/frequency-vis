@@ -79,7 +79,12 @@ void norm() {
     }
 
     for (int i = 0; i < (BUFFER_SIZE / 2); i++) {
-        norm_spectrum[i] = spectrum[i] / mx;
+        if (i%3 == 0) {
+            norm_spectrum[i] = 6.0f/15.0f;
+        } else {
+            norm_spectrum[i] = 0;
+        }
+        // norm_spectrum[i] = spectrum[i] / mx;
     }
 }
 
