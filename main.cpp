@@ -25,12 +25,14 @@ extern "C" void fftR4(short *y, short *x, int N);
 #define BLUE    0x0000FF
 
 Serial pc(USBTX, USBRX);
+Serial bt(p28, p27);
 NeoStrip leds(p18, N);
 DigitalIn change_color(p8);
 DigitalIn brightness_up(p11);
 DigitalIn brightness_down(p12);
 Ticker color_ticker;
 Ticker brightness_ticker;
+Ticker bt_ticker;
 
 int data_idx = 0;
 int samples_idx = 0;
@@ -45,16 +47,20 @@ float output_data[NUM_COLS];
 int colors[] = {RED, GREEN, BLUE};
 int color_idx = 0;
 float brightness = 0.5;
+char bnum = 0;
+char bhit = 0;
 
 float magnitude(short y1, short y2);
 int idxConversion(int c, int r);
 void spectrumToOutput();
+
 void updateSamples();
 void calcFFT();
-void printFFT();
 void lightLeds();
+
 void updateColor();
 void updateBrightness();
+void updateBT();
 
 /**
  * @brief Program main routine.
@@ -62,21 +68,31 @@ void updateBrightness();
  * @return int No return expected.
  */
 int main() {
+    // Clear LEDs on startup.
     leds.clear();
+    // Set the brightness to initial value (0.5).
     leds.setBrightness(brightness);
 
+    // Set all buttons to PullUp.
     change_color.mode(PullUp);
     brightness_down.mode(PullUp);
     brightness_down.mode(PullUp);
 
+    // Attach routines for color, brightness, and bluetooth to tickers.
     color_ticker.attach(&updateColor, 0.1);
     brightness_ticker.attach(&updateBrightness, 0.1);
+    bt_ticker.attach(&updateBT, 0.1);
 
+    // Main loop
     while (1) {
+        // Update the audio samples.
         updateSamples();
         if (full) {
+            // Calculate the FFT of the full audio samples[] array.
             calcFFT();
+            // Display FFT data on the NeoPixel LED strip.
             lightLeds();
+            // Tell the program to fill up another samples[] array.
             full = false;
         }
         wait(1.0/SAMPLE_RATE);
@@ -206,7 +222,6 @@ void lightLeds() {
  */
 void updateColor() {
     if (!change_color) {
-        pc.printf("Button 1 triggered.\n\r");
         color_idx = (color_idx + 1) % 3;
     }
 }
@@ -218,17 +233,54 @@ void updateColor() {
  */
 void updateBrightness() {
     if (!brightness_up && brightness < 1.0) {
-        pc.printf("Button 2 triggered.\n\r");
         brightness += 0.1;
         if (brightness > 1.0) {
             brightness = 1.0;
         }
     } 
     if (!brightness_down && brightness > 0.0) {
-        pc.printf("Button 3 triggered.\n\r");
         brightness -= 0.1;
         if (brightness < 0.0) {
             brightness = 0.0;
+        }
+    }
+}
+
+void updateBT() {
+    if (bt.getc() == '!') {
+        if (bt.getc() == 'B') { //button data packet
+            bnum = bt.getc(); //button number
+            bhit = bt.getc(); //1=hit, 0=release
+            if (bt.getc() == char(~('!' + 'B' + bnum + bhit))) { //checksum OK?
+                switch (bnum) {
+                    case '1': //number button 1
+                        if (bhit=='1') {
+                            //add hit code here
+                            pc.printf("Button 1 pressed.\n\r");
+                        } else {
+                            //add release code here
+                        }
+                        break;
+                    case '2': //number button 2
+                        if (bhit=='1') {
+                            //add hit code here
+                            pc.printf("Button 2 pressed.\n\r");
+                        } else {
+                            //add release code here
+                        }
+                        break;
+                    case '3': //number button 3
+                        if (bhit=='1') {
+                            //add hit code here
+                            pc.printf("Button 3 pressed.\n\r");
+                        } else {
+                            //add release code here
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }
