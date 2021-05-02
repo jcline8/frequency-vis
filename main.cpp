@@ -13,37 +13,48 @@ extern "C" void fftR4(short *y, short *x, int N);
 #define GREEN   0x00FF00
 #define BLUE    0x0000FF
 
-
-LocalFileSystem local("local");
 Serial pc(USBTX, USBRX);
 NeoStrip leds(p18, N);
+DigitalIn change_color(p8);
+DigitalIn brightness_up(p9);
+DigitalIn brightness_down(p10);
+Ticker color_ticker;
+Ticker brightness_ticker;
 
 int data_idx = 0;
 int samples_idx = 0;
 short samples[BUFFER_SIZE];
 bool full = false;
 
-short mx[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned fft input data
-short my[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned fft output data
-float spectrum[BUFFER_SIZE/2];  // frequency spectrum
-float norm_spectrum[NUM_COLS];  // frequency spectrum
+short mx[BUFFER_SIZE * 2];
+short my[BUFFER_SIZE * 2];
+float spectrum[BUFFER_SIZE/2];
+float output_data[NUM_COLS];
 
-int color = RED;
+int colors[] = {RED, GREEN, BLUE};
+int color_idx = 0;
 float brightness = 0.5;
 
 float magnitude(short y1, short y2);
 int idxConversion(int c, int r);
-void norm();
-
+void spectrumToOutput();
 void updateSamples();
-void printSamples();
 void calcFFT();
 void printFFT();
 void lightLeds();
+void updateColor();
+void updateBrightness();
 
 int main() {
     leds.clear();
     leds.setBrightness(brightness);
+
+    change_color.mode(PullUp);
+    brightness_down.mode(PullUp);
+    brightness_down.mode(PullUp);
+
+    color_ticker.attach(&updateColor, 1.0/SAMPLE_RATE);
+    // brightness_ticker.attach(&updateBrightness, 1.0/SAMPLE_RATE);
 
     while (1) {
         updateSamples();
@@ -70,20 +81,20 @@ int idxConversion(int c, int r) {
     return idx;
 }
 
-void norm() {
-    float mx = 0.0;
+void spectrumToOutput() {
+    float max = 0.0;
     for (int i = 0; i < NUM_COLS; i++) {
-        norm_spectrum[i] = 0.0;
+        output_data[i] = 0.0;
         for (int j = 0; j < 19; j++) {
-            norm_spectrum[i] += spectrum[(i * 19) + j];
+            output_data[i] += spectrum[i * 19 + j];
         }
-        norm_spectrum[i] /= 19;
-        if (norm_spectrum[i] > mx) {
-            mx = norm_spectrum[i];
+        output_data[i] /= 19;
+        if (output_data[i] > max) {
+            max = output_data[i];
         }
     }
     for (int i = 0; i < NUM_COLS; i++) {
-        norm_spectrum[i] /= mx;
+        output_data[i] /= max;
     }
 }
 
@@ -94,7 +105,7 @@ void updateSamples() {
         full = true;
         samples_idx = 0;
     }
-    if ((data_idx + BUFFER_SIZE) > (NUM_ELEMENTS - 1)) {
+    if (data_idx + BUFFER_SIZE > NUM_ELEMENTS - 1) {
         data_idx = 0;
     } else {
         data_idx += BUFFER_SIZE;
@@ -111,33 +122,35 @@ void calcFFT() {
     }
     fftR4(my, mx, BUFFER_SIZE);
     int j = 0;
-    for (int i = 0; i < BUFFER_SIZE; i+=2) {
+    for (int i = 0; i < BUFFER_SIZE; i += 2) {
         spectrum[j] = magnitude(my[i], my[i + 1]);
         j++;
     }
 }
 
-/*
- *    void printFFT() {
- *        FILE *fp = fopen("/local/fft.csv","w");
- *        int j = 0;
- *        for (int i = 0; i < BUFFER_SIZE; i += 2) {
- *            int frequency = int(SAMPLE_RATE / BUFFER_SIZE / 2 * i);
- *            fprintf(fp, "%d,%f\n", frequency, spectrum[j]);
- *           j++;
- *        }
- *        fclose(fp);
- *    }
- */
-
 void lightLeds() {
     leds.clear();
-    norm();
+    spectrumToOutput();
     for (int i = 0; i < NUM_COLS; i++) {
-        int height = (int) (((float) NUM_ROWS) * norm_spectrum[i]);
+        int height = (int) (((float) NUM_ROWS) * output_data[i]);
         for (int j = 0; j < height; j++) {
-            leds.setPixel(idxConversion(i, j), color);
+            leds.setPixel(idxConversion(i, j), colors[color_idx]);
         }
     }
+    leds.setBrightness(brightness);
     leds.write();
+}
+
+void updateColor() {
+    if (change_color == 0) {
+        color_idx = (color_idx + 1) % 3;
+    }
+}
+
+void updateBrightness() {
+    if (brightness_up == 0 && brightness < 1.0) {
+        brightness += 0.1;
+    } else if (brightness_down == 0 && brightness > 0.0) {
+        brightness -= 0.1;
+    }
 }
