@@ -20,14 +20,16 @@ NeoStrip leds(p18, N);
 
 int data_idx = 0;
 int samples_idx = 0;
-
 short samples[BUFFER_SIZE];
+bool full = false;
+
 short mx[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned fft input data
 short my[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned fft output data
 float spectrum[BUFFER_SIZE/2];  // frequency spectrum
 float norm_spectrum[BUFFER_SIZE/2];  // frequency spectrum
-bool full = false;
+
 int color = RED;
+float brightness = 0.5;
 
 float magnitude(short y1, short y2);
 int idxConversion(int c, int r);
@@ -40,8 +42,12 @@ void printFFT();
 void lightLeds();
 
 int main() {
+    leds.clear();
+    leds.setBrightness(brightness);
+
     for (int i = 0; i < N; i++) {
         leds.setPixel(i, RED);
+        leds.write();
         wait(0.01);
     }
 
@@ -53,7 +59,7 @@ int main() {
             // Do FFT
             calcFFT();
             // Display FFT
-            lightLeds();
+            // lightLeds();
             // Reset full flag
             full = false;
         }
@@ -137,6 +143,7 @@ void calcFFT() {
  */
 
 void lightLeds() {
+    leds.clear();
     norm();
     for (int i = 0; i < NUM_COLS; i++) {
         int height = (int) ((float) NUM_ROWS * norm_spectrum[i]);
@@ -144,4 +151,5 @@ void lightLeds() {
             leds.setPixel(idxConversion(i, j), color);
         }
     }
+    leds.write();
 }
