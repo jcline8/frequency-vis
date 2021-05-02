@@ -40,6 +40,11 @@ void printFFT();
 void lightLeds();
 
 int main() {
+    for (int i = 0; i < N; i++) {
+        leds.setPixel(i, RED);
+        wait(0.01);
+    }
+
     // Setup
     while (1) {
         // Always update samples
