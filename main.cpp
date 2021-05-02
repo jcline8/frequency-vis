@@ -63,14 +63,13 @@ void updateBrightness();
  */
 int main() {
     leds.clear();
-    leds.setBrightness(brightness);
 
     change_color.mode(PullUp);
     brightness_down.mode(PullUp);
     brightness_down.mode(PullUp);
 
-    color_ticker.attach(&updateColor, 1.0/SAMPLE_RATE);
-    brightness_ticker.attach(&updateBrightness, 1.0/SAMPLE_RATE);
+    color_ticker.attach(&updateColor, 0.1);
+    brightness_ticker.attach(&updateBrightness, 0.1);
 
     while (1) {
         updateSamples();
@@ -195,8 +194,8 @@ void lightLeds() {
             leds.setPixel(idxConversion(i, j), colors[color_idx]);
         }
     }
-    leds.setBrightness(brightness);
     leds.write();
+    leds.setBrightness(brightness);
 }
 
 /**
@@ -218,7 +217,8 @@ void updateColor() {
 void updateBrightness() {
     if (brightness_up == 0 && brightness < 1.0) {
         brightness += 0.1;
-    } else if (brightness_down == 0 && brightness > 0.0) {
+    } 
+    if (brightness_down == 0 && brightness > 0.0) {
         brightness -= 0.1;
     }
 }
