@@ -27,8 +27,8 @@ extern "C" void fftR4(short *y, short *x, int N);
 Serial pc(USBTX, USBRX);
 NeoStrip leds(p18, N);
 DigitalIn change_color(p8);
-DigitalIn brightness_up(p9);
-DigitalIn brightness_down(p10);
+DigitalIn brightness_up(p11);
+DigitalIn brightness_down(p12);
 Ticker color_ticker;
 Ticker brightness_ticker;
 
@@ -195,6 +195,7 @@ void lightLeds() {
             leds.setPixel(idxConversion(i, j), colors[color_idx]);
         }
     }
+    leds.setBrightness(brightness);
     leds.write();
 }
 
@@ -204,7 +205,8 @@ void lightLeds() {
  * Mod 3 to perform the wrap around calculation. (Eg. 2 -> 0, not 2 -> 3)
  */
 void updateColor() {
-    if (change_color == 0) {
+    if (!change_color) {
+        pc.printf("Button 1 triggered.\n\r");
         color_idx = (color_idx + 1) % 3;
     }
 }
@@ -215,18 +217,18 @@ void updateColor() {
  * If the brightness_down button is pushed and the brightness is not yet at min, decrement the brightness by 0.1.
  */
 void updateBrightness() {
-    if (brightness_up == 0 && brightness < 1.0) {
+    if (!brightness_up && brightness < 1.0) {
+        pc.printf("Button 2 triggered.\n\r");
         brightness += 0.1;
         if (brightness > 1.0) {
             brightness = 1.0;
         }
-        leds.setBrightness(brightness);
     } 
-    if (brightness_down == 0 && brightness > 0.0) {
+    if (!brightness_down && brightness > 0.0) {
+        pc.printf("Button 3 triggered.\n\r");
         brightness -= 0.1;
         if (brightness < 0.0) {
             brightness = 0.0;
         }
-        leds.setBrightness(brightness);
     }
 }
