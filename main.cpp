@@ -63,6 +63,7 @@ void updateBrightness();
  */
 int main() {
     leds.clear();
+    leds.setBrightness(brightness);
 
     change_color.mode(PullUp);
     brightness_down.mode(PullUp);
@@ -195,7 +196,6 @@ void lightLeds() {
         }
     }
     leds.write();
-    leds.setBrightness(brightness);
 }
 
 /**
@@ -217,8 +217,16 @@ void updateColor() {
 void updateBrightness() {
     if (brightness_up == 0 && brightness < 1.0) {
         brightness += 0.1;
+        if (brightness > 1.0) {
+            brightness = 1.0;
+        }
+        leds.setBrightness(brightness);
     } 
     if (brightness_down == 0 && brightness > 0.0) {
         brightness -= 0.1;
+        if (brightness < 0.0) {
+            brightness = 0.0;
+        }
+        leds.setBrightness(brightness);
     }
 }
