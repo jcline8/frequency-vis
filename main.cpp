@@ -25,14 +25,12 @@ extern "C" void fftR4(short *y, short *x, int N);
 #define BLUE    0x0000FF
 
 Serial pc(USBTX, USBRX);
-Serial bt(p28, p27);
 NeoStrip leds(p18, N);
 DigitalIn change_color(p8);
 DigitalIn brightness_up(p11);
 DigitalIn brightness_down(p12);
 Ticker color_ticker;
 Ticker brightness_ticker;
-Ticker bt_ticker;
 
 int data_idx = 0;
 int samples_idx = 0;
@@ -47,8 +45,6 @@ float output_data[NUM_COLS];
 int colors[] = {RED, GREEN, BLUE};
 volatile int color_idx = 0;
 volatile float brightness = 0.5;
-char bnum = 0;
-char bhit = 0;
 
 float magnitude(short y1, short y2);
 int idxConversion(int c, int r);
@@ -60,7 +56,6 @@ void lightLeds();
 
 void updateColor();
 void updateBrightness();
-void updateBT();
 
 /**
  * @brief Program main routine.
@@ -78,10 +73,9 @@ int main() {
     brightness_down.mode(PullUp);
     brightness_down.mode(PullUp);
 
-    // Attach routines for color, brightness, and bluetooth to tickers.
+    // Attach routines for color and brightness to tickers.
     color_ticker.attach(&updateColor, 0.1);
     brightness_ticker.attach(&updateBrightness, 0.1);
-    bt_ticker.attach(&updateBT, 0.1);
 
     // Main loop
     while (1) {
@@ -242,46 +236,6 @@ void updateBrightness() {
         brightness -= 0.1;
         if (brightness < 0.0) {
             brightness = 0.0;
-        }
-    }
-}
-
-/**
- * @brief 
- * 
- */
-void updateBT() {
-    if (bt.getc() == '!') {
-        if (bt.getc() == 'B') {
-            bnum = bt.getc();
-            bhit = bt.getc();
-            if (bt.getc() == char(~('!' + 'B' + bnum + bhit))) {
-                switch (bnum) {
-                    case '1':
-                        if (bhit=='1') {
-                            color_idx = (color_idx + 1) % 3;
-                        }
-                        break;
-                    case '2':
-                        if (bhit=='1') {
-                            brightness += 0.1;
-                            if (brightness > 1.0) {
-                                brightness = 1.0;
-                            }
-                        }
-                        break;
-                    case '3':
-                        if (bhit=='1') {
-                            brightness -= 0.1;
-                            if (brightness < 0.0) {
-                                brightness = 0.0;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
         }
     }
 }
