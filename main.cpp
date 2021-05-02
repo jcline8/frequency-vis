@@ -1,15 +1,22 @@
 #include "mbed.h"
+#include "NeoStrip.h"
 #include "audio.h"
 
 extern "C" void fftR4(short *y, short *x, int N);
-Serial pc(USBTX, USBRX);
 
 #define BUFFER_SIZE 1024
 #define SAMPLE_RATE 10000
 #define NUM_ROWS 15
-#define NUM_COLS 30
+#define NUM_COLS 26
+#define N 390
+#define RED     0xFF0000
+#define GREEN   0x00FF00
+#define BLUE    0x0000FF
+
 
 LocalFileSystem local("local");
+Serial pc(USBTX, USBRX);
+NeoStrip leds(p18, N);
 
 int data_idx = 0;
 int samples_idx = 0;
@@ -20,6 +27,7 @@ short my[BUFFER_SIZE * 2]; // 16 bit 4 byte alligned fft output data
 float spectrum[BUFFER_SIZE/2];  // frequency spectrum
 float norm_spectrum[BUFFER_SIZE/2];  // frequency spectrum
 bool full = false;
+int color = RED;
 
 float magnitude(short y1, short y2);
 int idxConversion(int c, int r);
@@ -52,7 +60,7 @@ float magnitude(short y1, short y2) {
     return sqrt(float(y1 * y1 + y2 * y2));
 }
 
-int idxConverstion(int c, int r) {
+int idxConversion(int c, int r) {
     int idx;
     if (c % 2 == 0) {
         idx = (c + 1) * NUM_ROWS - r - 1;
@@ -125,11 +133,10 @@ void calcFFT() {
 
 void lightLeds() {
     norm();
-    
     for (int i = 0; i < NUM_COLS; i++) {
         int height = (int) ((float) NUM_ROWS * norm_spectrum[i]);
-        pc.printf("%d, ", height);
+        for (int j = 0; j < height; j++) {
+            leds.setPixel(idxConversion(i, j), color);
+        }
     }
-    pc.printf("\n\n\r");
-    wait(0.05);
 }
