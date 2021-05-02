@@ -71,20 +71,6 @@ int idxConversion(int c, int r) {
 }
 
 void norm() {
-    // float mx = 0;
-    // for (int i = 1; i < (NUM_COLS + 1); i++) {
-    //     if (spectrum[i] > mx) {
-    //         mx = spectrum[i];
-    //     }
-    // }
-    // for (int i = 0; i < NUM_COLS; i++) {
-    //     // if (i%3 == 0) {
-    //     //     norm_spectrum[i] = 6.0f/15.0f;
-    //     // } else {
-    //     //     norm_spectrum[i] = 0;
-    //     // }
-    //     norm_spectrum[i] = spectrum[i+1] / mx;
-    // }
     float mx = 0.0;
     for (int i = 0; i < NUM_COLS; i++) {
         norm_spectrum[i] = 0.0;
@@ -102,7 +88,7 @@ void norm() {
 }
 
 void updateSamples() {
-    samples[samples_idx] = (short) (sound_data[data_idx] - 0x8000);
+    samples[samples_idx] = sound_data[data_idx];
     samples_idx++;
     if (samples_idx >= BUFFER_SIZE) {
         full = true;
