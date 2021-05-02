@@ -14,14 +14,16 @@ Ike Gugel, Tolga Ustuner, James Cline
 ### MBed: 
 | Part | Description |
 | ----------- | ----------- |
-| Arm Mbed LPC1768 | Main microcontroller for managing pushbotton and light control. 
+| Arm Mbed LPC1768 | Main microcontroller for managing pushbottons and light control. 
 | 5V Barrel Jack and Power Supply | Used to provide input power for the entire board. | 
-| Pushbuttons | Used to change the settings of the LE
+| Pushbuttons | Used as PullUps to change the color settings of the LEDs. |
+| Resistors | 330 ohm resistors used to implement pullup buttons. | 
+
 
 ## **Code Documentation**
 ### Libraries:
 #### `mbed.h`
-
+The library mbed.h contains the MBed SDK tools required to define inputs and outputs on the MBed LCP1768 microcontroller.
 #### `NeoStrip.h`
 
 #### `FFTCM3.s`
