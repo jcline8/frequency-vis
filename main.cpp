@@ -45,8 +45,8 @@ float spectrum[BUFFER_SIZE/2];
 float output_data[NUM_COLS];
 
 int colors[] = {RED, GREEN, BLUE};
-int color_idx = 0;
-float brightness = 0.5;
+volatile int color_idx = 0;
+volatile float brightness = 0.5;
 char bnum = 0;
 char bhit = 0;
 
@@ -246,35 +246,36 @@ void updateBrightness() {
     }
 }
 
+/**
+ * @brief 
+ * 
+ */
 void updateBT() {
     if (bt.getc() == '!') {
-        if (bt.getc() == 'B') { //button data packet
-            bnum = bt.getc(); //button number
-            bhit = bt.getc(); //1=hit, 0=release
-            if (bt.getc() == char(~('!' + 'B' + bnum + bhit))) { //checksum OK?
+        if (bt.getc() == 'B') {
+            bnum = bt.getc();
+            bhit = bt.getc();
+            if (bt.getc() == char(~('!' + 'B' + bnum + bhit))) {
                 switch (bnum) {
-                    case '1': //number button 1
+                    case '1':
                         if (bhit=='1') {
-                            //add hit code here
-                            pc.printf("Button 1 pressed.\n\r");
-                        } else {
-                            //add release code here
+                            color_idx = (color_idx + 1) % 3;
                         }
                         break;
-                    case '2': //number button 2
+                    case '2':
                         if (bhit=='1') {
-                            //add hit code here
-                            pc.printf("Button 2 pressed.\n\r");
-                        } else {
-                            //add release code here
+                            brightness += 0.1;
+                            if (brightness > 1.0) {
+                                brightness = 1.0;
+                            }
                         }
                         break;
-                    case '3': //number button 3
+                    case '3':
                         if (bhit=='1') {
-                            //add hit code here
-                            pc.printf("Button 3 pressed.\n\r");
-                        } else {
-                            //add release code here
+                            brightness -= 0.1;
+                            if (brightness < 0.0) {
+                                brightness = 0.0;
+                            }
                         }
                         break;
                     default:
