@@ -1,3 +1,14 @@
+/**
+ * @file main.cpp
+ * @author J. Harper Cline (james.h.cline@gmail.com)
+ * @brief Code to visualize the frequency spectrum of an audio file.
+ * @version 0.1
+ * @date 2021-05-02
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "mbed.h"
 #include "NeoStrip.h"
 #include "audio.h"
@@ -45,6 +56,11 @@ void lightLeds();
 void updateColor();
 void updateBrightness();
 
+/**
+ * @brief Program main routine.
+ * 
+ * @return int 
+ */
 int main() {
     leds.clear();
     leds.setBrightness(brightness);
@@ -54,7 +70,7 @@ int main() {
     brightness_down.mode(PullUp);
 
     color_ticker.attach(&updateColor, 1.0/SAMPLE_RATE);
-    // brightness_ticker.attach(&updateBrightness, 1.0/SAMPLE_RATE);
+    brightness_ticker.attach(&updateBrightness, 1.0/SAMPLE_RATE);
 
     while (1) {
         updateSamples();
@@ -67,10 +83,24 @@ int main() {
     }
 }
 
+/**
+ * @brief Get the magnitude of a complex number.
+ * 
+ * @param y1 The real component of the complex number. 
+ * @param y2 The imaginary component of the complex number.
+ * @return float The magnitude of the real and imaginary component.
+ */
 float magnitude(short y1, short y2) {
     return sqrt(float(y1 * y1 + y2 * y2));
 }
 
+/**
+ * @brief Convert a 2-D array index to a 1-D array index.
+ * 
+ * @param c The column index value.
+ * @param r The row index value.
+ * @return int The 1-D NeoPixel strip array index.
+ */
 int idxConversion(int c, int r) {
     int idx;
     if (c % 2 == 0) {
@@ -81,6 +111,10 @@ int idxConversion(int c, int r) {
     return idx;
 }
 
+/**
+ * @brief Converts the FFT spectrum to an array output for the NeoPixel strip.
+ * 
+ */
 void spectrumToOutput() {
     float max = 0.0;
     for (int i = 0; i < NUM_COLS; i++) {
@@ -98,6 +132,10 @@ void spectrumToOutput() {
     }
 }
 
+/**
+ * @brief Fills the sample buffer with a slice of the audio data. When out of audio data, restart from beginning.
+ * 
+ */
 void updateSamples() {
     samples[samples_idx] = sound_data[data_idx];
     samples_idx++;
@@ -112,6 +150,10 @@ void updateSamples() {
     }
 }
 
+/**
+ * @brief Computes the FFT of a set of audio samples.
+ * 
+ */
 void calcFFT() {
     for (int i = 0; i < 2 * BUFFER_SIZE; i++) {
         my[i] = 0;
@@ -128,6 +170,10 @@ void calcFFT() {
     }
 }
 
+/**
+ * @brief Displays the FFT spectrum on the the NeoPixel strip.
+ * 
+ */
 void lightLeds() {
     leds.clear();
     spectrumToOutput();
@@ -141,12 +187,20 @@ void lightLeds() {
     leds.write();
 }
 
+/**
+ * @brief If the change_color button is pushed, move to the next color in the colors array
+ * 
+ */
 void updateColor() {
     if (change_color == 0) {
         color_idx = (color_idx + 1) % 3;
     }
 }
 
+/**
+ * @brief If the brightness_up button is pushed, increment the brightness by 0.1. If the brightness_down button is pushed, decrement the brightness by 0.1.
+ * 
+ */
 void updateBrightness() {
     if (brightness_up == 0 && brightness < 1.0) {
         brightness += 0.1;
