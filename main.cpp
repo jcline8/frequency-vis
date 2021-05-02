@@ -72,19 +72,19 @@ int idxConversion(int c, int r) {
 
 void norm() {
     float mx = 0;
-    for (int i = 0; i < (BUFFER_SIZE / 2); i++) {
+    for (int i = 1; i < (BUFFER_SIZE / 2); i++) {
         if (spectrum[i] > mx) {
             mx = spectrum[i];
         }
     }
-
-    for (int i = 0; i < (BUFFER_SIZE / 2); i++) {
-        if (i%3 == 0) {
-            norm_spectrum[i] = 6.0f/15.0f;
-        } else {
-            norm_spectrum[i] = 0;
-        }
-        // norm_spectrum[i] = spectrum[i] / mx;
+    norm_spectrum[0] = 0;
+    for (int i = 1; i < (BUFFER_SIZE / 2); i++) {
+        // if (i%3 == 0) {
+        //     norm_spectrum[i] = 6.0f/15.0f;
+        // } else {
+        //     norm_spectrum[i] = 0;
+        // }
+        norm_spectrum[i] = spectrum[i] / mx;
     }
 }
 
@@ -135,7 +135,8 @@ void lightLeds() {
     leds.clear();
     norm();
     for (int i = 0; i < NUM_COLS; i++) {
-        int height = (int) ((float) NUM_ROWS * norm_spectrum[i]);
+        // int height = (int) ((float) NUM_ROWS * 0.5f * (norm_spectrum[2*i] + norm_spectrum[2*i+1]));
+        int height = (int) ((float) NUM_ROWS * (norm_spectrum[i+1]));
         for (int j = 0; j < height; j++) {
             leds.setPixel(idxConversion(i, j), color);
         }
