@@ -4,31 +4,30 @@
 Ike Gugel, Tolga Ustuner, James Cline
 
 ## **Parts List**
-### LED Board:
+### **LED Board**:
 | Part | Description |
 | ----------- | ----------- |
-| Frost Glaze Plastic Overlay| Forefront plastic piece used to blur LEDs. | 
+| Frost Glaze Plastic Overlay | Forefront plastic piece used to blur LEDs. |
 | #10-32 x 2 in Phillips Screws | Used to attach the Frost Glaze Plastic Overlay to the board with LED strips. |
 | 3/16 Washers | Used to further secure the Plastic Overlay to the board. |
 | Alitove LED Strip | Roll of 150 WS2812b LEDs, three rolls were soldered onto the board. |
-### MBed: 
+### **MBed**: 
 | Part | Description |
 | ----------- | ----------- |
-| Arm Mbed LPC1768 | Main microcontroller for managing pushbottons and light control. 
-| 5V Barrel Jack and Power Supply | Used to provide input power for the entire board. | 
+| Arm Mbed LPC1768 | Main microcontroller for managing pushbottons and light control. |
+| 5V Barrel Jack and Power Supply | Used to provide input power for the entire board. |
 | Pushbuttons | Used as PullUps to change the color settings of the LEDs. |
-| Resistors | 330 ohm resistors used to implement pullup buttons. | 
-
+| Resistors | 330 ohm resistors used to implement pullup buttons. |
 
 ## **Code Documentation**
-### Libraries:
+### **Libraries**:
 #### `mbed.h`
-The library mbed.h contains the MBed SDK tools required to define inputs and outputs on the MBed LCP1768 microcontroller.
+The C++ library mbed.h contains the MBed SDK tools required to define inputs and outputs on the MBed LCP1768 microcontroller.
 #### `NeoStrip.h`
-
+The C++ library NeoStrip.h contains the classes and methods required to set the hue and brightness of an LED in a strip of AdaFruit NeoPixel RGB LEDs. Publically available at: https://os.mbed.com/users/yanndouze/code/NeoStrip/annotate/662aa70e768f/NeoStrip.h/
 #### `FFTCM3.s`
-
-### Methods:
+The ARM assembly library FFTCM3.s contains the methods required to compute the FFT of a set of samples to obtain a frequency analysis. Publically available at: https://github.com/gabonator/DS203/blob/master/Source/HwLayer/ArmM3/bios/FFTCM3.s
+### **Methods**:
 #### `float magnitude(short y1, short y2)`
 | Category | Description |
 | ----------- | ----------- |
