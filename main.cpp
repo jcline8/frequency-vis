@@ -71,19 +71,33 @@ int idxConversion(int c, int r) {
 }
 
 void norm() {
-    float mx = 0;
-    for (int i = 1; i < (NUM_COLS + 1); i++) {
-        if (spectrum[i] > mx) {
-            mx = spectrum[i];
+    // float mx = 0;
+    // for (int i = 1; i < (NUM_COLS + 1); i++) {
+    //     if (spectrum[i] > mx) {
+    //         mx = spectrum[i];
+    //     }
+    // }
+    // for (int i = 0; i < NUM_COLS; i++) {
+    //     // if (i%3 == 0) {
+    //     //     norm_spectrum[i] = 6.0f/15.0f;
+    //     // } else {
+    //     //     norm_spectrum[i] = 0;
+    //     // }
+    //     norm_spectrum[i] = spectrum[i+1] / mx;
+    // }
+    float mx = 0.0;
+    for (int i = 0; i < NUM_COLS; i++) {
+        norm_spectrum[i] = 0.0;
+        for (int j = 0; j < 19; j++) {
+            norm_spectrum[i] += spectrum[(i * 19) + j];
+        }
+        norm_spectrum[i] /= 19;
+        if (norm_spectrum[i] > mx) {
+            mx = norm_spectrum[i];
         }
     }
     for (int i = 0; i < NUM_COLS; i++) {
-        // if (i%3 == 0) {
-        //     norm_spectrum[i] = 6.0f/15.0f;
-        // } else {
-        //     norm_spectrum[i] = 0;
-        // }
-        norm_spectrum[i] = spectrum[i+1] / mx;
+        norm_spectrum[i] /= mx;
     }
 }
 
@@ -134,8 +148,7 @@ void lightLeds() {
     leds.clear();
     norm();
     for (int i = 0; i < NUM_COLS; i++) {
-        // int height = (int) ((float) NUM_ROWS * 0.5f * (norm_spectrum[2*i] + norm_spectrum[2*i+1]));
-        int height = (int) ((float) NUM_ROWS * (norm_spectrum[i]));
+        int height = (int) (((float) NUM_ROWS) * norm_spectrum[i]);
         for (int j = 0; j < height; j++) {
             leds.setPixel(idxConversion(i, j), color);
         }
