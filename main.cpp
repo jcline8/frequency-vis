@@ -59,7 +59,7 @@ void updateBrightness();
 /**
  * @brief Program main routine.
  * 
- * @return int 
+ * @return int No return expected.
  */
 int main() {
     leds.clear();
@@ -96,7 +96,8 @@ float magnitude(short y1, short y2) {
 
 /**
  * @brief Convert a 2-D array index to a 1-D array index.
- * 
+ * @details If the column index is even, index the row from the top to bottom to compensate for the strip being reversed.
+ * If the column index is odd, index the row from the bottom to top because the strip is in the propper orientation.
  * @param c The column index value.
  * @param r The row index value.
  * @return int The 1-D NeoPixel strip array index.
@@ -113,7 +114,9 @@ int idxConversion(int c, int r) {
 
 /**
  * @brief Converts the FFT spectrum to an array output for the NeoPixel strip.
- * 
+ * @details spectrum[] has a length of 512, so divide spectrum[] by the NUM_COLS in the display to get 19 spectrum[] values per bin.
+ * Average 19 spectrum[] values and put store that average in output_data[].
+ * Normalize output_data[] to be left with values from 0.0f - 1.0f.
  */
 void spectrumToOutput() {
     float max = 0.0;
@@ -134,7 +137,9 @@ void spectrumToOutput() {
 
 /**
  * @brief Fills the sample buffer with a slice of the audio data. When out of audio data, restart from beginning.
- * 
+ * @details Fill samples[] with data from sound_data[] until it is full.
+ * When samples[] is full, set the full flag and reset the samples_idx to base.
+ * When out sound_data[], reset the data_idx to base.
  */
 void updateSamples() {
     samples[samples_idx] = sound_data[data_idx];
@@ -152,7 +157,10 @@ void updateSamples() {
 
 /**
  * @brief Computes the FFT of a set of audio samples.
- * 
+ * @details Clear the input (mx[]) and output (my[]) arrays to the fftR4() method.
+ * Populate mx[] with audio sample values.
+ * Compute the FFT using fftR4().
+ * Populate spectrum[] with the magnitude of the real and imaginary components of my[].
  */
 void calcFFT() {
     for (int i = 0; i < 2 * BUFFER_SIZE; i++) {
@@ -172,7 +180,11 @@ void calcFFT() {
 
 /**
  * @brief Displays the FFT spectrum on the the NeoPixel strip.
- * 
+ * @details Clear the NeoPixel LED strip.
+ * Convert the current sample frequency spectrum to a valide NeoPixel output.
+ * Populate each column with the output_data[] array.
+ * Update the LED strip brightness.
+ * Write the brightness and values to the NeoPixel LED strip.
  */
 void lightLeds() {
     leds.clear();
@@ -188,8 +200,9 @@ void lightLeds() {
 }
 
 /**
- * @brief If the change_color button is pushed, move to the next color in the colors array
- * 
+ * @brief Change the current color.
+ * @details If the button is pushed (PullUp mode so value 0), increment the color_idx value to select the next color.
+ * Mod 3 to perform the wrap around calculation. (Eg. 2 -> 0, not 2 -> 3)
  */
 void updateColor() {
     if (change_color == 0) {
@@ -198,8 +211,9 @@ void updateColor() {
 }
 
 /**
- * @brief If the brightness_up button is pushed, increment the brightness by 0.1. If the brightness_down button is pushed, decrement the brightness by 0.1.
- * 
+ * @brief Change the current brightness.
+ * @details If the brightness_up button is pushed and the brightness is not yet at max, increment the brightness by 0.1.
+ * If the brightness_down button is pushed and the brightness is not yet at min, decrement the brightness by 0.1.
  */
 void updateBrightness() {
     if (brightness_up == 0 && brightness < 1.0) {
