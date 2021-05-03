@@ -160,7 +160,7 @@ void spectrumToOutput() {
  * When out sound_data[], reset the data_idx to base.
  */
 void updateSamples() {
-    samples[samples_idx] = sound_data[data_idx];
+    samples[samples_idx] = sound_data[data_idx + samples_idx];
     samples_idx++;
     if (samples_idx >= BUFFER_SIZE) {
         full = true;
