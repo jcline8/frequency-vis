@@ -20,7 +20,7 @@ Ike Gugel, Tolga Ustuner, James Cline
 | Resistors | 330 ohm resistors used to implement pullup buttons. |
 
 ## **Schematic**
-![image](https://drive.google.com/uc?export=view&id=<FILE_ID>)
+![image]("Images/Screen Shot 2021-05-02 at 17.59.46.png")
 
 ## **Code Documentation**
 ### **Libraries**:
