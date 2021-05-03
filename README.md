@@ -20,7 +20,7 @@ Ike Gugel, Tolga Ustuner, James Cline
 | Resistors | 330 ohm resistors used to implement pullup buttons. |
 
 ## **Schematic**
-![image]("Images/Screen Shot 2021-05-02 at 17.59.46.png")
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/Screen%20Shot%202021-05-02%20at%2017.59.46.png)
 
 ## **Code Documentation**
 ### **Libraries**:
@@ -78,4 +78,15 @@ The ARM assembly library FFTCM3.s contains the methods required to compute the F
 | Details | If the brightness_up button is pushed and the brightness is not yet at max, increment the brightness by 0.1. If the brightness_down button is pushed and the brightness is not yet at min, decrement the brightness by 0.1. |
 
 ## **Additional Photos and Videos**
-TODO
+### **LED Board**
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/PXL_20210503_190819516.MP.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/PXL_20210503_190901581.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/PXL_20210503_191636479.MP.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/PXL_20210503_191640982.NIGHT.jpg)
+### **MBed**
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/IMG_0313.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/IMG_0314.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/IMG_0315.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/IMG_0316.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/IMG_0317.jpg)
+![image](https://github.com/jcline8/frequency-vis/blob/main/Images/IMG_0318.jpg)
