@@ -23,7 +23,7 @@ extern "C" void fftR4(short *y, short *x, int N);
 #define RED     0xFF0000
 #define GREEN   0x00FF00
 #define BLUE    0x0000FF
-#define ENABLE_RAINBOW 1
+#define ENABLE_RAINBOW 0
 
 Serial pc(USBTX, USBRX);
 NeoStrip leds(p18, N);
@@ -43,7 +43,6 @@ short my[BUFFER_SIZE * 2];
 float spectrum[BUFFER_SIZE/2];
 float output_data[NUM_COLS];
 
-int colors[] = {RED, GREEN, BLUE};
 int rainbow[] = {RED, RED, 
                 0xFFA500, 0xFFA500, 
                 0xFFFF00, 0xFFFF00, 
@@ -213,7 +212,7 @@ void lightLeds() {
             if (ENABLE_RAINBOW) {
                 leds.setPixel(idxConversion(i, j), rainbow[j]);
             } else {
-                leds.setPixel(idxConversion(i, j), colors[color_idx]);
+                leds.setPixel(idxConversion(i, j), rainbow[color_idx]);
             }
         }
     }
@@ -228,7 +227,7 @@ void lightLeds() {
  */
 void updateColor() {
     if (!change_color) {
-        color_idx = (color_idx + 1) % 3;
+        color_idx = (color_idx + 1) % NUM_ROWS;
     }
 }
 
