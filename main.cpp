@@ -132,8 +132,8 @@ int idxConversion(int c, int r) {
 
 /**
  * @brief Converts the FFT spectrum to an array output for the NeoPixel strip.
- * @details spectrum[] has a length of 512, so divide spectrum[] by the NUM_COLS in the display to get 19 spectrum[] values per bin.
- * Average 19 spectrum[] values and put store that average in output_data[].
+ * @details spectrum[] has a length of 512, so divide 512 by the NUM_COLS in the display to get 19 spectrum[] values per bin.
+ * Average 19 spectrum[] values and store that average in output_data[].
  * Normalize output_data[] to be left with values from 0.0f - 1.0f.
  */
 void spectrumToOutput() {

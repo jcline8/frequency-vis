@@ -19,6 +19,9 @@ Ike Gugel, Tolga Ustuner, James Cline
 | Pushbuttons | Used as PullUps to change the color settings of the LEDs. |
 | Resistors | 330 ohm resistors used to implement pullup buttons. |
 
+## **Schematic**
+![image](https://drive.google.com/uc?export=view&id=<FILE_ID>)
+
 ## **Code Documentation**
 ### **Libraries**:
 #### `mbed.h`
@@ -47,7 +50,7 @@ The ARM assembly library FFTCM3.s contains the methods required to compute the F
 | Category | Description |
 | ----------- | ----------- |
 | Summary | Converts the FFT spectrum to an array output for the NeoPixel strip. |
-| Details | spectrum[] has a length of 512, so divide spectrum[] by the NUM_COLS in the display to get 19 spectrum[] values per bin. Average 19 spectrum[] values and put store that average in output_data[]. Normalize output_data[] to be left with values from 0.0f - 1.0f. |
+| Details | spectrum[] has a length of 512, so divide 512 by the NUM_COLS in the display to get 19 spectrum[] values per bin. Average 19 spectrum[] values and store that average in output_data[]. Normalize output_data[] to be left with values from 0.0f - 1.0f. |
 #### `void updateSamples()`
 | Category | Description |
 | ----------- | ----------- |
@@ -73,3 +76,6 @@ The ARM assembly library FFTCM3.s contains the methods required to compute the F
 | ----------- | ----------- |
 | Summary | Change the current brightness. |
 | Details | If the brightness_up button is pushed and the brightness is not yet at max, increment the brightness by 0.1. If the brightness_down button is pushed and the brightness is not yet at min, decrement the brightness by 0.1. |
+
+## **Additional Photos and Videos**
+TODO
